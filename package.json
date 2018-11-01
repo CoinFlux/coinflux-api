@@ -1,6 +1,6 @@
 {
   "name": "coinflux-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "coinflux.com API client library for NodeJS",
   "keywords": [
     "coinflux",

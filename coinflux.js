@@ -10,7 +10,8 @@ const defaults = {
   },
 	version : "v0",
 	timeout : 20000,
-  env     : "prod"
+  env     : "prod",
+	ua: "CoinFlux Javascript API Client"
 };
 const methods = {
   public : ["getRates", "getRate"],
@@ -50,8 +51,6 @@ const getMessageSignature = (path, body, secret, nonce) => {
 
 // Send an API request
 const rawRequest = async (url, headers, reqData, verb, timeout) => {
-	// Set custom User-Agent string
-	headers['user-agent'] = 'CoinFlux Javascript API Client';
 
 	const options = { headers, timeout };
 
@@ -87,8 +86,6 @@ const rawRequest = async (url, headers, reqData, verb, timeout) => {
       };
     }
   }
-
-
 };
 
 /**
@@ -155,8 +152,9 @@ class CoinFluxClient {
         break;
     }
 
+		const headers = {"user-agent": this.config.ua};
     const url      = this.config.url[this.config.env] + path;
-    const response = rawRequest(url, {}, {}, verb, this.config.timeout);
+    const response = rawRequest(url, headers, {}, verb, this.config.timeout);
 
     if(typeof callback === 'function') {
       response
@@ -256,6 +254,7 @@ class CoinFluxClient {
       "coinflux-api-key"  : this.config.key,
       "coinflux-api-sign" : "",
       "coinflux-api-nonce" : nonce,
+			"user-agent": this.config.ua
     };
 
     let signature, response;

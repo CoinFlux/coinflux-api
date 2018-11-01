@@ -20,7 +20,8 @@ const key          = '...'; // API Key
 const secret       = '...'; // API Private Key
 const options      = {
 	"env": "test", //defaults to prod -> production
-	"timeout": 20000 //optional, defaults to 20000
+	"timeout": 20000, //optional, defaults to 20000
+	"ua" : "Client software name" //optional
 }
 const CoinFluxClient = require('coinflux-api');
 const coinflux       = new CoinFluxClient(key, secret, options);

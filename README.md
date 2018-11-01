@@ -8,7 +8,7 @@ This is an asynchronous NodeJS client for the coinflux.com API. It exposes all t
 ## Install
 
 ```sh
-$ npm install pg
+$ npm install coinflux-api
 ```
 
 ---

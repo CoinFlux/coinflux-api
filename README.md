@@ -38,6 +38,7 @@ const coinflux       = new CoinFluxClient(key, secret, options);
 
 # __Public methods__
 
+## __Rates__
 ###getRates
 ###getRate
 parameters: `pair`

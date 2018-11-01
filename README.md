@@ -36,14 +36,16 @@ const coinflux       = new CoinFluxClient(key, secret, options);
 ---
 # __Documentation__
 
-# __Public methods__
+This section states available methods and required parameters.
+
+# __Public methods__ (no authentication required)
 
 ## __Rates__
-###getRates
-###getRate
+### getRates
+### getRate
 parameters: `pair`
 
-# __Private methods__
+# __Private methods__ (authentication required)
 
 ## __Fluxes__
 ### getFluxes

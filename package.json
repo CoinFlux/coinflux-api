@@ -1,0 +1,33 @@
+{
+  "name": "coinflux-api",
+  "version": "0.0.1",
+  "description": "coinflux.com API client library for NodeJS",
+  "keywords": [
+    "coinflux",
+    "api",
+    "btc",
+    "bitcoin"
+  ],
+  "author": "CoinFlux (https://github.com/CoinFlux)",
+  "contributors": [
+    "Robert Myers (https://github.com/nothingisdead/npm-kraken-api)"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "qs": ">=6.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CoinFlux/coinflux-api"
+  },
+  "main": "coinflux.js",
+  "engines": {
+    "node": ">=8.10"
+  },
+  "bugs": {
+    "url": "https://github.com/CoinFlux/coinflux-api/issues",
+    "email": "api@coinflux.com"
+  },
+  "readmeFilename": "README.md"
+}

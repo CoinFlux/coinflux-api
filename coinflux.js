@@ -15,9 +15,9 @@ const defaults = {
 };
 const methods = {
   public : ["getRates", "getRate"],
-  private : ["getFluxes", "getFlux", "getFluxAddresses", "getAddress", "newAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
-  get: ["getRates", "getRate", "getFluxes", "getFlux", "getFluxAddresses", "getAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
-  post: ["newAddress"]
+  private : ["getFluxes", "getFlux", "getFluxAddresses", "getFluxOfAddress", "newSellAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
+  get: ["getRates", "getRate", "getFluxes", "getFlux", "getFluxAddresses", "getFluxOfAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
+  post: ["newSellAddress"]
 }
 const paths = {
   getRates: "/public/rates",
@@ -25,8 +25,8 @@ const paths = {
   getFluxes: "/private/fluxes",
   getFlux: "/private/fluxes/{fluxid}",
   getFluxAddresses: "/private/fluxes/{fluxid}/addresses",
-  getAddress: "/private/addresses/{address}",
-  newAddress: "/private/addresses",
+  getFluxOfAddress: "/private/fluxes/addresses/{address}",
+  newSellAddress: "/private/fluxes/addresses",
   getWallets: "/private/wallets",
   getWallet: "/private/wallets/{walletid}",
   getLedger: "/private/ledger",
@@ -38,8 +38,8 @@ const paths = {
 }
 
 // Create a signature for a request
-const getMessageSignature = (path, body, secret, nonce) => {
-	const message       = qs.stringify(body);
+const getMessageSignature = (path, queryStringParameters, secret, nonce) => {
+	const message       = qs.stringify(queryStringParameters);
 	const secret_buffer = Buffer.from(secret, 'hex');
 	const hash          = new crypto.createHash('sha256');
 	const hmac          = new crypto.createHmac('sha512', secret_buffer);
@@ -61,7 +61,7 @@ const rawRequest = async (url, headers, reqData, verb, timeout) => {
 
   if (verb === 'POST') {
     Object.assign(options, {
-  		body   : qs.stringify(reqData)
+			params: reqData
   	});
   }
   console.log(options);
@@ -70,21 +70,30 @@ const rawRequest = async (url, headers, reqData, verb, timeout) => {
     const {data} = await axios(options);
     return data;
   } catch (err) {
-    err = err.response;
-    if(Object.keys(err.data).includes("error")) {
+		if (err.response) {
+			err = err.response;
+			if(Object.keys(err.data).includes("error")) {
 
-      throw {
-        statusCode: err.status,
-        statusText: err.statusText,
-        error: err.data.error
-      };
-    } else {
-      throw {
-        statusCode: err.status,
-        statusText: err.statusText,
-        error: err.statusText
-      };
-    }
+				throw {
+					statusCode: err.status,
+					statusText: err.statusText,
+					error: err.data.error
+				};
+			} else {
+				throw {
+					statusCode: err.status,
+					statusText: err.statusText,
+					error: err.statusText
+				};
+			}
+		} else if (err.code === "ECONNABORTED") {
+			throw {
+				statusCode: "ECONNABORTED",
+				statusText: "Connection timed out",
+				error: "Connection timed out"
+			};
+		}
+
   }
 };
 
@@ -189,20 +198,22 @@ class CoinFluxClient {
           throw new Error("Missing parmater: fluxid");
         }
         break;
-      case 'getAddress':
+      case 'getFluxOfAddress':
         if (params.address) {
           path = path.replace("{address}", params.address)
         } else {
           throw new Error("Missing parmater: address");
         }
         break;
-      case 'newAddress':
+      case 'newSellAddress':
         verb = 'POST';
-        if (params.fluxid) {
-          path = path.replace("{fluxid}", params.fluxid)
-        } else {
+        if (!params.fluxid) {
           throw new Error("Missing parmater: fluxid");
         }
+
+				if (Object.keys(params).length > 1) {
+					throw new Error("Call accepts a single parameter: fluxid");
+				}
         break;
       case 'getWallet':
         if (params.walletid) {

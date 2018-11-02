@@ -54,8 +54,10 @@ parameters: `pair`
 parameters: `fluxid`
 ### getFluxAddresses
 parameters: `fluxid`
-### getAddress
+### getFluxOfAddress
 parameters: `address`
+### newSellAddress
+parameters: `fluxid`
 
 ## __Wallets__
 ### getWallets

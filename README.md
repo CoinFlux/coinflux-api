@@ -78,6 +78,10 @@ parameters: `ledgerid`
 ### getBankAccount
 parameters: `accountid`
 
+## __Trade__
+### buyToAddress
+parameters: `walletid`, `address`, `ccy1`, `cost` and, optionally for XRP, `address_tag`
+
 ---
 
 ### Credit:

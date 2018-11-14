@@ -1,6 +1,5 @@
 const axios  = require('axios');
 const crypto = require('crypto');
-const qs     = require('qs');
 
 // Default options
 const defaults = {
@@ -15,9 +14,9 @@ const defaults = {
 };
 const methods = {
   public : ["getRates", "getRate"],
-  private : ["getFluxes", "getFlux", "getFluxAddresses", "getFluxOfAddress", "newSellAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
+  private : ["getFluxes", "getFlux", "getFluxAddresses", "getFluxOfAddress", "newSellAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount", "buyToAddress"],
   get: ["getRates", "getRate", "getFluxes", "getFlux", "getFluxAddresses", "getFluxOfAddress", "getWallets", "getWallet", "getLedger", "getLedgerTx", "getWalletHistory", "getWalletHistoryTx", "getBankAccounts", "getBankAccount"],
-  post: ["newSellAddress"]
+  post: ["newSellAddress", "buyToAddress"]
 }
 const paths = {
   getRates: "/public/rates",
@@ -34,12 +33,20 @@ const paths = {
   getWalletHistory: "/private/wallets/{walletid}/history",
   getWalletHistoryTx: "/private/wallets/{walletid}/history/{historyid}",
   getBankAccounts: "/private/bankaccounts",
-  getBankAccount: "/private/bankaccounts/{accountid}"
+  getBankAccount: "/private/bankaccounts/{accountid}",
+	buyToAddress: "/private/trade/buy/toAddress"
 }
 
 // Create a signature for a request
 const getMessageSignature = (path, queryStringParameters, secret, nonce) => {
-	const message       = qs.stringify(queryStringParameters);
+  const qs = require('qs');
+
+  // Function to sort paramaters alphabetically
+	function alphabeticalSort(a, b) {
+    return a.localeCompare(b);
+	}
+
+	const message       = qs.stringify(queryStringParameters, {sort: alphabeticalSort});
 	const secret_buffer = Buffer.from(secret, 'hex');
 	const hash          = new crypto.createHash('sha256');
 	const hmac          = new crypto.createHmac('sha512', secret_buffer);
@@ -256,6 +263,28 @@ class CoinFluxClient {
           throw new Error("Missing parmater: accountid");
         }
         break;
+			case 'buyToAddress':
+				verb = 'POST';
+				if (!params.walletid) {
+					throw new Error("Missing parmater: walletid");
+				}
+
+				if (!params.address) {
+					throw new Error("Missing parmater: address");
+				}
+
+				if (!params.cost) {
+					throw new Error("Missing parmater: cost");
+				}
+
+				if (!params.ccy1) {
+					throw new Error("Missing parmater: ccy1");
+				}
+
+				if (Object.keys(params).length > 5) {
+					throw new Error("Call accepts the following parameters: walletid, address, cost, ccy1");
+				}
+				break;
     }
 
     const url      = this.config.url[this.config.env] + path;
@@ -299,6 +328,12 @@ class CoinFluxClient {
     return response;
   }
 
+}
+
+function sorted(o) {
+  let p = Object.create(null);
+  for (const k of Object.keys(o).sort()) p[k] = o[k];
+  return p;
 }
 
 module.exports = CoinFluxClient;
